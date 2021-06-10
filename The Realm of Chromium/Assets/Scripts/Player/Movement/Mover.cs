@@ -11,6 +11,10 @@ public class Mover : MonoBehaviour
     Ray lastRay;
     RaycastHit lastRayHit;
 
+    public LayerMask ground;
+
+    [SerializeField] GameObject playerModel;
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -22,14 +26,29 @@ public class Mover : MonoBehaviour
         {
             MoveToCursor();
         }
+        else if(Input.GetMouseButton(0))
+        {
+            MoveToCursor();
+        }
+
+        UpdateAnimatoion();
     }
 
     void MoveToCursor()
     {
         lastRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Physics.Raycast(lastRay, out lastRayHit);
+        Physics.Raycast(lastRay, out lastRayHit, ground);
         destination = lastRayHit.point;
-        agent.SetDestination(destination);
+        agent.SetDestination(destination);     
+    }
+
+    void UpdateAnimatoion()
+    {
+        Vector3 velocity = agent.velocity;
+        Vector3 localVelocity = transform.InverseTransformDirection(velocity);
+        float speed = localVelocity.z;
+
+        playerModel.GetComponent<Animator>().SetFloat("ForwardSpeed", speed);
     }
 
 }
